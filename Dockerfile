@@ -22,6 +22,5 @@ COPY --chown=user Video.py Audio.py ./
 COPY --chown=user web ./web
 
 # Hugging Face Spaces expone el puerto 7860
-EXPOSE 7860
-
-CMD ["uvicorn", "web.app:app", "--host", "0.0.0.0", "--port", "7860"]
+EXPOSE 10000
+CMD ["sh", "-c", "uvicorn web.app:app --host 0.0.0.0 --port ${PORT:-10000}"]
