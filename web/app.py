@@ -2,10 +2,26 @@ import os
 import sys
 import uuid
 import shutil
+import yt_dlp
 import threading
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
+
+
+_OriginalYDL = yt_dlp.YoutubeDL
+
+class _MobileClientYoutubeDL(_OriginalYDL):
+    def __init__(self, params=None, auto_init=True):
+        params = dict(params) if params else {}
+        extractor_args = dict(params.get("extractor_args", {}))
+        youtube_args = dict(extractor_args.get("youtube", {}))
+        youtube_args.setdefault("player_client", ["android", "ios", "web"])
+        extractor_args["youtube"] = youtube_args
+        params["extractor_args"] = extractor_args
+        super().__init__(params, auto_init)
+
+yt_dlp.YoutubeDL = _MobileClientYoutubeDL
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
